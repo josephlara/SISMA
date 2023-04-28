@@ -12,15 +12,15 @@ library(mozR)
 
 year <- "2023"
 
-cpn_path <- glue::glue("Data/MISAU/SMI/sisma_cpn_{year}.csv")
-ats_results_path <- glue::glue("Data/MISAU/ATS/ats_results_{year}.csv")
-ats_hist_path <- glue::glue("Data/MISAU/ATS/ats_hist_{year}.csv")
-ats_ci_path <- glue::glue("Data/MISAU/ATS/ats_ci_lig_{year}.csv")
-ats_ccsd_path <- glue::glue("Data/MISAU/ATS/ats_ccs_ccd_{year}.csv")
-ats_saaj_path <- glue::glue("Data/MISAU/ATS/ats_saaj_cm_{year}.csv")
-ats_smi_path <- glue::glue("Data/MISAU/ATS/ats_smi_{year}.csv")
-ats_auto_path <- glue::glue("Data/MISAU/ATS/ats_autotest_{year}.csv")
-hiv_tarv_path <- glue::glue("Data/MISAU/CT/tarv_{year}.csv")
+cpn_path <- glue::glue("Data/sisma_cpn_{year}.csv")
+ats_results_path <- glue::glue("Data/ats_resultados_{year}.csv")
+ats_hist_path <- glue::glue("Data/ats_hist_chave_{year}.csv")
+ats_ci_path <- glue::glue("Data/ats_ci_lig_{year}.csv")
+ats_ccsd_path <- glue::glue("Data/ats_smi_ccs_ccd_{year}.csv")
+ats_saaj_path <- glue::glue("Data/ats_saaj_cm_{year}.csv")
+ats_smi_path <- glue::glue("Data/ats_smi_{year}.csv")
+ats_auto_path <- glue::glue("Data/ats_autoteste_{year}.csv")
+hiv_tarv_path <- glue::glue("Data/tarv_{year}.csv")
 
 # STATUS ------------------------------------------------------------------
 
@@ -39,14 +39,6 @@ df_c <- bind_rows(df_1, df_2, df_3, df_4, df_5, df_6)
 
 # FUNCTIONAL -----------------------------------------------------------
 
-df <- clean_sisma_csv(hiv_tarv_path)
-
-df_function_parse <- df %>%
-  parse_sisma_hiv_tarv()
-
-
-
-data <- as.tibble(data_sisma_ats_results)
 
 
 # EXPIREMENT FUNCTION -----------------------------------------------------
@@ -56,7 +48,6 @@ df_function_parse <- df %>%
   tidyr::drop_na(tidyselect::any_of(c("indicator_new", "value"))) %>%
   dplyr::select(sisma_uid, snu, psnu, sitename, period, indicator = indicator_new, age, sex, exit_type, value)
 sum(df_function_parse$value, na.rm=T)
-
 
 
 df_function_parse <- df %>%
