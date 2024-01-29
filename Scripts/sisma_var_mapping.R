@@ -9,16 +9,7 @@ library(mozR)
 
 year <- "2023"
 
-ats_results_path <- glue::glue("Data/ats_resultados_{year}.csv")
-ats_hist_path <- glue::glue("Data/ats_hist_chave_{year}.csv")
-ats_ci_path <- glue::glue("Data/ats_ci_lig_{year}.csv")
-ats_ccsd_path <- glue::glue("Data/ats_smi_ccs_ccd_{year}.csv")
-ats_saaj_path <- glue::glue("Data/ats_saaj_cm_{year}.csv")
-ats_smi_path <- glue::glue("Data/ats_smi_{year}.csv")
-ats_auto_path <- glue::glue("Data/ats_autoteste_{year}.csv")
-cpn_path <- glue::glue("Data/smi_cpn_{year}.csv")
-hiv_tarv_path <- glue::glue("Data/tarv_{year}.csv")
-prep_path <- glue::glue("Data/prep_{year}.csv")
+
 its_path <- glue::glue("Data/its_{year}.csv")
 
 
@@ -89,23 +80,35 @@ df <- clean_sisma_csv(its_path)
 df_indicators <- df %>% 
   distinct(indicator)
 
-mz_its_1a_consulta
 
 df_feature_eng <- df %>% 
   distinct(indicator) %>% 
   mutate(
     
     indicator_new = case_when(indicator == "mz_its_1a_consulta" ~ "ITS_1CONS_TOT",
-                              str_detect(indicator, "1a_consulta_populacao_chave_") ~ "ITS_1CONS",
-                              str_detect(indicator, "_testados_da_sifilis_") ~ "ITS_TESTE_SIF",
-                              str_detect(indicator, "_testados_para_hiv_") ~ "ITS_TESTE_HIV",
-                              str_detect(indicator, "_corrimento_uretral_") ~ "ITS_CORRI",
-                              str_detect(indicator, "_ulcera_genital_") ~ "ITS_ULCERA",
-                              str_detect(indicator, "_leucorreia_") ~ "ITS_LEUCOR",
-                              str_detect(indicator, "_consulta_prevencao_") ~ "ITS_CONS_PREV",
-                              str_detect(indicator, "_todas_as_consultas_") ~ "ITS_CONS_TOT",
-                              str_detect(indicator, "mz_its_caso_indice") ~ "ITS_CASO_TIPO",
-                              str_detect(indicator, "mz_its_contacto") ~ "ITS_CASO_TIPO",
+                              str_detect(indicator, "mz_its_caso_indice") ~ "ITS_1CONS_TIPO",
+                              str_detect(indicator, "mz_its_contacto") ~ "ITS_1CONS_TIPO",
+                              
+                              str_detect(indicator, "mz_its_sexo_") ~ "ITS_1CONS_SEXO",
+                              
+                              str_detect(indicator, "_corrimento_uretral_") ~ "ITS_1CONS_DIAG_COR",
+                              str_detect(indicator, "_ulcera_genital_") ~ "ITS_1CONS_DIAG_ULC",
+                              str_detect(indicator, "_leucorreia_") ~ "ITS_1CONS_DIAG_LEU",
+                              
+                              str_detect(indicator, "_populacao_chave_pertence_") ~ "ITS_1CONS_PC_PERT",
+                              str_detect(indicator, "_populacao_chave_sub_grupo_") ~ "ITS_1CONS_PC",
+
+                              str_detect(indicator, "_testados_para_hiv_") ~ "ITS_1CONS_TESTE_HIV",
+                              str_detect(indicator, "_testados_da_sifilis_") ~ "ITS_1CONS_TESTE_SIF",
+
+                              str_detect(indicator, "_consulta_prevencao_") ~ "ITS_1CONS_PREV",
+                              
+                              str_detect(indicator, "_todas_as_consultas_") ~ "ITS_TCONS_SEXO",
+                              str_detect(indicator, "_todas_as_consultas_") ~ "ITS_TCONS_PERT",
+                              
+                              str_detect(indicator, "_justificacoes_") ~ "ITS_CASO_TIPO",
+                              indicator == "mz_its_total_consultas" ~ "ITS_TCONS_TOT",
+                              indicator == "mz_its_total_consultas_com_rastreio_its" ~ "ITS_TCONS_RAS",
                               TRUE ~ indicator),
     
     sex = case_when(str_detect(indicator, "masculino") ~ "Masculino",
@@ -138,10 +141,10 @@ df_feature_eng <- df %>%
                              TRUE ~ NA_character_)
 )
 
-df_count <- df %>% 
-  count(indicator,
+df_count <- df_feature_eng %>% 
+  count(indicator_new,
         wt = value)
 
-write_csv(df_count,
-          "Dataout/count.csv",
+write_csv(df_feature_eng,
+          "Dataout/its_vars.csv",
           na = "")
