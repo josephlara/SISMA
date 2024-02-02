@@ -23,6 +23,18 @@ year <- "2023"
 path_ats_results <- glue::glue("Data/ajm_hc_mm_{year}.csv")
 
 df <- clean_sisma_csv(path_ats_results)
+df00 <- read_csv("Data/ajm_hc_mm_2023.csv")
+df0 <- read_csv("Data/ajm_hc_mm_2023.csv") %>% clean_names()
+
+df1 <- df0 %>% 
+  select('mz_ajmhcmm_ajm_novos_utentes_hiv_inscritos_10_14_anos_feminino',
+         'mz_ajmhcmm_ajm_novos_utentes_hiv_inscritos_10_14_anos_feminino_2',
+         'mz_ajmhcmm_ajm_novos_utentes_hiv_inscritos_10_14_anos_masculino',
+         'mz_ajmhcmm_ajm_novos_utentes_hiv_inscritos_10_14_anos_masculino_2',
+         'mz_ajmhcmm_ajm_novos_utentes_hiv_inscritos_15_24_feminino',
+         'mz_ajmhcmm_ajm_novos_utentes_hiv_inscritos_15_24_feminino',
+         'mz_ajmhcmm_ajm_novos_utentes_hiv_inscritos_15_24_masculino',
+         'mz_ajmhcmm_ajm_novos_utentes_hiv_inscritos_15_24_masculino_2')
 
 df_indicators <- df %>% distinct(indicator) %>% 
   mutate(
@@ -93,15 +105,24 @@ df_indicators <- df %>% distinct(indicator) %>%
                              str_detect(indicator, "_sairam_por_obito_") ~ "Obito",
                              str_detect(indicator, "_sairam_por_referido_") ~ "Referido",
                              str_detect(indicator, "_sairam_por_transferido_") ~ "Transferido",
-                             TRUE ~ NA_character_)
+                             TRUE ~ NA_character_),
+    result_status = case_when(indicator == "mz_ajmhcmm_ajm_novos_utentes_hiv_inscritos_10_14_anos_feminino" ~ "Positivo",
+                              indicator == "mz_ajmhcmm_ajm_novos_utentes_hiv_inscritos_10_14_anos_feminino_2" ~ "Negativo",
+                              indicator == "mz_ajmhcmm_ajm_novos_utentes_hiv_inscritos_10_14_anos_masculino" ~ "Positivo",
+                              indicator == "mz_ajmhcmm_ajm_novos_utentes_hiv_inscritos_10_14_anos_masculino_2" ~ "Negativo",
+                              indicator == "mz_ajmhcmm_ajm_novos_utentes_hiv_inscritos_15_24_feminino" ~ "Positivo",
+                              indicator == "mz_ajmhcmm_ajm_novos_utentes_hiv_inscritos_15_24_feminino_2" ~ "Negativo",
+                              indicator == "mz_ajmhcmm_ajm_novos_utentes_hiv_inscritos_15_24_masculino" ~ "Positivo",
+                              indicator == "mz_ajmhcmm_ajm_novos_utentes_hiv_inscritos_15_24_masculino_2" ~ "Negativo",
+                              TRUE ~ NA_character_)
     ) 
 
 
-
-mz_ajmhcmm_ajm_novos_utentes_hiv_inscritos_10_14_anos_feminino_2 # WTF
-
-,
-
+write_csv(
+  df_indicators,
+  "Documents/ajm_hc_mm_map.csv",
+  na = ""
+)
 
     
     sub_group = case_when(str_detect(indicator, "_hsh") ~ "HSH",

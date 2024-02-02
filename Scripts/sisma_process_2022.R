@@ -29,13 +29,12 @@ path_ats_saaj <- glue::glue("Data/ats_saaj_cm_{year}.csv")
 path_ats_smi <- glue::glue("Data/ats_smi_{year}.csv")
 path_ats_auto <- glue::glue("Data/ats_autoteste_{year}.csv")
 path_hiv_tarv <- glue::glue("Data/tarv_{year}.csv")
-path_hiv_prep <- glue::glue("Data/prep_{year}.csv")
+path_hiv_prep <- glue::glue("Data/prep_{year}.csv") #
 path_hiv_apss <- glue::glue("Data/apss_{year}.csv") 
-path_hiv_its <- glue::glue("Data/its_{year}.csv")
-path_hiv_ajmhcmm <- glue::glue("Data/ajm_hc_mm_{year}.csv")
-path_smi_cpn <- glue::glue("Data/smi_cpn_{year}.csv")
-path_smi_mat <- glue::glue("Data/smi_mat_{year}.csv")
-path_smi_ccr <- glue::glue("Data/smi_ccr_{year}.csv")
+path_hiv_its <- glue::glue("Data/its_{year}.csv") #
+path_smi_cpn <- glue::glue("Data/smi_cpn_{year}.csv") #
+path_smi_mat <- glue::glue("Data/smi_mat_{year}.csv") #
+path_smi_ccr <- glue::glue("Data/smi_ccr_{year}.csv") #
 
 # output paths
 output_ats <- glue::glue("Data/processed/ats_{year}.txt")
@@ -44,15 +43,14 @@ output_hiv_tarv <- glue::glue("Data/processed/hiv_tarv_{year}.txt")
 output_hiv_prep <- glue::glue("Data/processed/hiv_prep_{year}.txt")
 output_hiv_apss <- glue::glue("Data/processed/hiv_apss_{year}.txt")
 output_hiv_its <- glue::glue("Data/processed/hiv_its_{year}.txt")
-output_hiv_ajmhcmm <- glue::glue("Data/processed/ajm_hc_mm_{year}.txt")
 output_smi_cpn <- glue::glue("Data/processed/smi_cpn_{year}.txt")
 output_smi_mat <- glue::glue("Data/processed/smi_mat_{year}.txt")
 output_smi_ccr <- glue::glue("Data/processed/smi_ccr_{year}.txt")
 
 
-# # identify processed files
-# path_outputs <- "Dataout/"
-# sisma_historical_files <- dir("Dataout/", pattern = "*.txt")
+# identify processed files
+path_outputs <- "Dataout/"
+sisma_historical_files <- dir("Dataout/", pattern = "*.txt")
 
 
 # PROCESS PORTUGUESE-------------------------------------------------------------------
@@ -65,24 +63,25 @@ df_ats <- bind_rows(process_sisma_csv(path_ats_results, type = "ATS Result"),
                     process_sisma_csv(path_ats_saaj, type = "ATS SAAJ"),
                     process_sisma_csv(path_ats_smi, type = "ATS SMI")
 )
-
+# 2023 only
 df_autoteste <- process_sisma_csv(path_ats_auto, 
                                   type = "ATS Auto")
 
+# 2023 only
 df_apss <- process_sisma_csv(path_hiv_apss, 
                              type = "HIV APSS")
 
+# 2023 only
 df_its <- process_sisma_csv(path_hiv_its,
                             type = "HIV ITS")
 
+# 2023 only
 df_prep <- process_sisma_csv(path_hiv_prep, 
                              type = "HIV PREP")
 
+# 2023 only
 df_tarv <- process_sisma_csv(path_hiv_tarv, 
                              type = "HIV TARV")
-
-df_ajmhcmm <- process_sisma_csv(path_hiv_ajmhcmm, 
-                             type = "HIV AJMHCMM")
 
 df_smi_ccr <- process_sisma_csv(path_smi_ccr, 
                                 type = "SMI-CCR")
@@ -90,6 +89,7 @@ df_smi_ccr <- process_sisma_csv(path_smi_ccr,
 df_smi_cpn <- process_sisma_csv(path_smi_cpn,
                                 type = "SMI-CPN")
 
+# 2023 only
 df_smi_mat <- process_sisma_csv(path_smi_mat, 
                                 type = "SMI-MAT")
 
@@ -105,9 +105,6 @@ write_tsv(df_autoteste,
 
 write_tsv(df_tarv,
           output_hiv_tarv)
-
-write_tsv(df_ajmhcmm,
-          output_hiv_ajmhcmm)
 
 write_tsv(df_prep,
           output_hiv_prep)
@@ -202,53 +199,19 @@ all_data <- map_dfr(input_files, ~report_create_all(.x, period = PERIOD))
 # COMPILE HISTORICAL DATA -------------------------------------------------
 
 
-historical_tarv <- 
-  list.files("Data/processed/", pattern = "^hiv_tarv|^ajm_|^hiv_apss_", full.names = TRUE) %>% 
-  map(~ read_tsv(.x)) %>%
+hiv_tarv_files <- list.files("Data/processed/", pattern = "^hiv_tarv", full.names = TRUE)
+
+
+sisma_historical_df <- sisma_historical_files %>% 
+  map(~ read_tsv(file.path("Data/processed/", .))) %>%
   reduce(rbind)
 
-
-historical_smi <- 
-  list.files("Data/processed/", pattern = "^smi_", full.names = TRUE) %>% 
-  map(~ read_tsv(.x)) %>%
+sisma_historical_df <- sisma_historical_files %>% 
+  map(~ read_tsv(list.files("Data/processed/", pattern = "^hiv_tarv", full.names = TRUE))) %>%
   reduce(rbind)
 
-
-historical_ats <- 
-  list.files("Data/processed/", pattern = "^ats_20|^ats_auto", full.names = TRUE) %>% 
-  map(~ read_tsv(.x)) %>%
-  reduce(rbind)
-
-
-historical_prev <- 
-  list.files("Data/processed/", pattern = "^hiv_prep_|^hiv_its_", full.names = TRUE) %>% 
-  map(~ read_tsv(.x)) %>%
+sisma_historical_df <- map(hiv_tarv_files, ~read_tsv(.)) %>%
   reduce(rbind)
 
 
 # -------------------------------------------------------------------------
-
-
-write_tsv(
-  historical_tarv,
-  "Dataout/db_tarv.txt",
-  na = ""
-)
-
-write_tsv(
-  historical_smi,
-  "Dataout/db_smi.txt",
-  na = ""
-)
-
-write_tsv(
-  historical_ats,
-  "Dataout/db_ats.txt",
-  na = ""
-)
-
-write_tsv(
-  historical_prev,
-  "Dataout/db_prev.txt",
-  na = ""
-)
