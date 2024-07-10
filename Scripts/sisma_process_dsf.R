@@ -4,7 +4,7 @@
 
 # LOAD DEPENDENCIES -------------------------------------------------------
 
-
+# Hi Fidel, congrats on learning R!
 library(tidyverse)
 library(sismar)
 library(janitor)
