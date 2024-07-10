@@ -1,9 +1,9 @@
 
 # remotes::install_github("josephlara/sismar")
+# https://github.com/josephlara/SISMA
 # install.packages('glamr', repos = c('https://usaid-oha-si.r-universe.dev', 'https://cloud.r-project.org'))
 
 # LOAD DEPENDENCIES -------------------------------------------------------
-
 
 library(tidyverse)
 library(sismar)
@@ -12,15 +12,12 @@ library(mozR)
 library(glamr)
 library(openxlsx)
 library(googledrive)
-load_secrets()
-
 
 # USER INPUT --------------------------------------------------------------
 
 year <- "2024"
 
 # INPUT/OUTPUT PATHS ------------------------------------------------------------
-
 
 # input paths
 path_smi_cpn <- glue::glue("Data/smi_cpn_{year}.csv")
@@ -44,7 +41,6 @@ output_smi_ug <- glue::glue("Data/processed/smi_ug_{year}.txt")
 # path for saving historical datasets on google drive
 path_historic_output_gdrive <- as_id("https://drive.google.com/drive/folders/1otEzX8FK6867lpB47k3RsvhjHO9cKPP9")
 
-
 # PROCESS PORTUGUESE-------------------------------------------------------------------
 
 df_smi_cpn <- process_sisma_csv(path_smi_cpn,
@@ -67,7 +63,6 @@ df_smi_ccs <- process_sisma_csv(path_smi_ccs,
 
 df_smi_ug <- process_sisma_csv(path_smi_ug,
                                 type = "SMI-UG")
-
 
 # WRITE TO DISK -----------------------------------------------------------
 
@@ -94,15 +89,12 @@ write_tsv(df_smi_ug,
 
 # COMPILE HISTORICAL DATA -------------------------------------------------
 
-
 historical_smi <- 
   list.files("Data/processed/", pattern = "^smi_", full.names = TRUE) %>% 
   map(~ read_tsv(.x)) %>%
   reduce(rbind)
 
-
 # WRITE TO LOCAL DISK -----------------------------------------------------
-
 
 write_tsv(
   historical_smi,
