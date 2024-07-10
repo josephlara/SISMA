@@ -60,7 +60,7 @@ output_smi_pav <- glue::glue("Data/processed/smi_pav_{year}.txt")
 output_smi_ccd <- glue::glue("Data/processed/smi_ccd_{year}.txt")
 
 # path for saving historical datasets on google drive
-path_historic_output_gdrive <- as_id("https://https://drive.google.com/drive/folders/1otEzX8FK6867lpB47k3RsvhjHO9cKPP9")
+path_historic_output_gdrive <- as_id("https://drive.google.com/drive/folders/1otEzX8FK6867lpB47k3RsvhjHO9cKPP9")
 
 
 # PROCESS PORTUGUESE-------------------------------------------------------------------
@@ -237,13 +237,20 @@ historical_tarv <-
   map(~ read_tsv(.x)) %>%
   reduce(rbind)
 
-  # attach_meta_coord()
-
-
 historical_smi <- 
   list.files("Data/processed/", pattern = "^smi_", full.names = TRUE) %>% 
   map(~ read_tsv(.x)) %>%
   reduce(rbind)
+
+historical_smi_pcmd <- 
+  list.files("Data/processed/", pattern = "^smi_", full.names = TRUE) %>% 
+  map(~ read_tsv(.x)) %>%
+  reduce(rbind) |> 
+  attach_meta_coord() |>
+  attach_meta_uid() |> 
+  attach_meta_partner("Alcancar") |> 
+  attach_meta_partner("MSSFPO") |> 
+  attach_meta_partner("PEPFAR_Clinical")
 
 
 historical_ats <- 
@@ -256,6 +263,8 @@ historical_prev <-
   list.files("Data/processed/", pattern = "^hiv_prep_|^hiv_its_", full.names = TRUE) %>% 
   map(~ read_tsv(.x)) %>%
   reduce(rbind)
+
+
 
 
 # WRITE TO LOCAL DISK -----------------------------------------------------
@@ -271,6 +280,13 @@ write_tsv(
 write_tsv(
   historical_smi,
   "Dataout/db_smi.txt",
+  na = ""
+)
+
+
+write_tsv(
+  historical_smi_pcmd,
+  "Dataout/db_dsf.txt",
   na = ""
 )
 
@@ -294,6 +310,9 @@ drive_put("Dataout/db_tarv.txt",
           path = path_historic_output_gdrive)
 
 drive_put("Dataout/db_smi.txt",
+          path = path_historic_output_gdrive)
+
+drive_put("Dataout/db_smi_dsf.txt",
           path = path_historic_output_gdrive)
 
 drive_put("Dataout/db_ats.txt",
